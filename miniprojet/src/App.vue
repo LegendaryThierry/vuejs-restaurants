@@ -1,18 +1,13 @@
 <template>
   <v-app id="app">
-    <restaurants-liste></restaurants-liste>
+    <router-view></router-view>
   </v-app>
 </template>
 
 <script>
-import RestaurantsListe from './components/RestaurantsListe';
 
 export default {
   name: 'App',
-
-  components: {
-    RestaurantsListe,
-  },
 
   data: () => ({
     //

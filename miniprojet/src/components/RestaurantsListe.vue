@@ -58,20 +58,34 @@
         <h1>{{ restaurants_count }} restaurants disponibles</h1>
         <v-card>
             <v-card-title>
-                <v-btn color="primary" dark class="mb-2" @click="add_new_restaurant">Ajouter un restaurant</v-btn>
-                <v-spacer></v-spacer>
-                <v-text-field
-                    v-model="search_restaurant_name"
-                    :append-outer-icon="'mdi-magnify'"
-                    clear-icon="mdi-close-circle"
-                    clearable
-                    label="Rechercher par nom"
-                    type="text"
-                    @click:append-outer="search"
-                    v-on:keyup.enter="search"
-                ></v-text-field>
+                    <v-col cols="2">
+                        <v-btn color="primary" dark class="mb-2" @click="add_new_restaurant">Ajouter un restaurant</v-btn>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-subheader class="pl-0">Nombre de restaurants par page:</v-subheader>
+                        <v-slider
+                            v-model="items_per_page"
+                            thumb-label="always"
+                            @change="change_page_size"
+                        ></v-slider>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-text-field
+                            v-model="search_restaurant_name"
+                            :append-outer-icon="'mdi-magnify'"
+                            clear-icon="mdi-close-circle"
+                            clearable
+                            label="Rechercher par nom"
+                            type="text"
+                            @click:append-outer="search"
+                            v-on:keyup.enter="search"
+                        ></v-text-field>
+                    </v-col>
             </v-card-title>
-            <v-data-table :headers="headers" :items="restaurants" :items-per-page="items_per_page" :loading="data_table_loading">
+            <v-btn color="primary" dark class="col-md-2 offset-md-4 page_button" @click="previous"><v-icon>mdi-arrow-left-bold</v-icon> Précédent</v-btn>
+            <v-btn color="primary" dark class="col-md-2 page_button" @click="next">Suivant <v-icon>mdi-arrow-right-bold</v-icon></v-btn>
+
+            <v-data-table :headers="headers" :items="restaurants" :items-per-page="items_per_page" :loading="data_table_loading" hide-default-footer>
                 <template v-slot:item.detail="{ item }">
                     <v-btn color="primary" dark class="mb-2" @click="voir_details(item)">Voir détails</v-btn>
                 </template>
@@ -90,6 +104,7 @@ export default {
     name: "RestaurantsListe",
     data () {
         return {
+            items_per_page: 10,
             search_restaurant_name: "",
             add_new_restaurant_success: false,
             add_new_restaurant_error: false,
@@ -98,8 +113,7 @@ export default {
             data_table_loading: false,
             deleted_restaurant_success: false,
             deleted_restaurant_error: false,
-            nb_pages: 1,
-            items_per_page: 10,
+            nb_page: 1,
             url: "http://localhost:8080/api/restaurants/",
             edit_restaurant_dialog: false,
             add_new_restaurant_dialog: false,
@@ -122,12 +136,23 @@ export default {
         }
     },
     methods: {
+        previous(){
+            this.nb_page--;
+            this.get_restaurants();
+        },
+        next(){
+            this.nb_page++;
+            this.get_restaurants();
+        },
+        change_page_size(){
+            this.get_restaurants();
+        },
         get_restaurants(){
             this.data_table_loading = true;
             var xmlhttp = new XMLHttpRequest();
             var self = this;
 
-            let url = this.url + "?name=" + this.search_restaurant_name;
+            let url = this.url + "?page=" + this.nb_page + "&pagesize=" + this.items_per_page + "&name=" + this.search_restaurant_name;
 
             xmlhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -218,7 +243,7 @@ export default {
             });
         },
         voir_details(item){
-            alert(item["_id"]);
+            this.$router.push("details/" + item["_id"]);
         },
         delete_restaurant(item){
             var self = this;
@@ -266,5 +291,8 @@ export default {
     }
     #delete_restaurant:hover{
         color: red;
+    }
+    .page_button{
+        margin: 5px;
     }
 </style>
