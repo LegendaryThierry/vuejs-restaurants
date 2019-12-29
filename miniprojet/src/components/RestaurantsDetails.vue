@@ -4,64 +4,64 @@
         :loading="loading"
         class="mx-auto my-12"
         >
-        <v-img
-            height="250"
-            src="https://source.unsplash.com/random?restaurant"
-        ></v-img>
-    
-        <v-card-title>{{ this.current_restaurant.name }}</v-card-title>
-    
-        <v-card-text>
-            <v-row
-            align="center"
-            class="mx-0"
-            >
-            <v-rating
-                :value="mean"
-                color="amber"
-                half-increments
-                readonly
-                size="14"
-            ></v-rating>
-    
-            <div class="grey--text ml-4">{{this.mean}} ({{this.nb_comments}} notes)</div>
-            </v-row>
-    
-            <div class="my-4 subtitle-1 black--text">
-            Cuisine • {{ this.current_restaurant.cuisine }}
-            </div>
-    
-            <h3>{{ address }}</h3>
-            <RestaurantsMap></RestaurantsMap>
-        </v-card-text>
-    
-        <v-divider class="mx-4"></v-divider>
-    
-        <v-card-title>Tonight's availability</v-card-title>
-    
-        <v-card-text>
-            <v-chip-group
-            active-class="deep-purple accent-4 white--text"
-            column
-            >
-            <v-chip>5:30PM</v-chip>
-    
-            <v-chip>7:30PM</v-chip>
-    
-            <v-chip>8:00PM</v-chip>
-    
-            <v-chip>9:00PM</v-chip>
-            </v-chip-group>
-        </v-card-text>
-    
-        <v-card-actions>
-            <v-btn
-            color="deep-purple accent-4"
-            text
-            >
-            Reserve
-            </v-btn>
-        </v-card-actions>
+            <v-img
+                height="250"
+                src="https://source.unsplash.com/random?restaurant"
+            ></v-img>
+        
+            <v-card-title>{{ this.current_restaurant.name }}</v-card-title>
+        
+            <v-card-text>
+                <v-row
+                align="center"
+                class="mx-0"
+                >
+                <v-rating
+                    :value="mean"
+                    color="amber"
+                    half-increments
+                    readonly
+                    size="14"
+                ></v-rating>
+        
+                <div class="grey--text ml-4">{{this.mean}} ({{this.nb_comments}} notes)</div>
+                </v-row>
+        
+                <div class="my-4 subtitle-1 black--text">
+                Cuisine • {{ this.current_restaurant.cuisine }}
+                </div>
+        
+                <h3 id="address"><v-icon>mdi-map-marker</v-icon>{{ address }}</h3>
+                <RestaurantsMap v-bind:latitude="latitude" v-bind:longitude="longitude" v-bind:name="name" v-bind:address="address"></RestaurantsMap>
+            </v-card-text>
+        
+            <v-divider class="mx-4"></v-divider>
+        
+            <v-card-title>Tonight's availability</v-card-title>
+        
+            <v-card-text>
+                <v-chip-group
+                active-class="deep-purple accent-4 white--text"
+                column
+                >
+                <v-chip>5:30PM</v-chip>
+        
+                <v-chip>7:30PM</v-chip>
+        
+                <v-chip>8:00PM</v-chip>
+        
+                <v-chip>9:00PM</v-chip>
+                </v-chip-group>
+            </v-card-text>
+        
+            <v-card-actions>
+                <v-btn
+                color="deep-purple accent-4"
+                text
+                >
+                Reserve
+                </v-btn>
+            </v-card-actions>
         </v-card>
     </v-app>
 </template>
@@ -163,6 +163,15 @@ export default {
         address: function(){
             return this.current_restaurant.address.building + " " + this.current_restaurant.address.street +
             this.current_restaurant.address.zipcode + " " + this.city + " " + this.state;
+        },
+        latitude(){
+            return this.current_restaurant.address.coord[1];
+        },
+        longitude(){
+            return this.current_restaurant.address.coord[0];
+        },
+        name(){
+            return this.current_restaurant.name;
         }
     }
 }
@@ -173,5 +182,8 @@ export default {
         font-family: Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+    }
+    #address{
+        margin-bottom: 5px;
     }
 </style>
