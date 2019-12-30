@@ -3,6 +3,7 @@
         <v-card
         :loading="loading"
         class="mx-auto my-12"
+        min-width="75%"
         >
             <v-img
                 height="250"
@@ -31,8 +32,11 @@
                 Cuisine • {{ this.current_restaurant.cuisine }}
                 </div>
         
-                <h3 id="address"><v-icon>mdi-map-marker</v-icon>{{ address }}</h3>
+                <h3 class="margin_top_bottom"><v-icon>mdi-map-marker</v-icon>{{ address }}</h3>
                 <RestaurantsMap v-bind:latitude="latitude" v-bind:longitude="longitude" v-bind:name="name" v-bind:address="address"></RestaurantsMap>
+                <v-btn class="col-sm-12 margin_top_bottom" dark color="green" @click="see_menus">
+                    <v-icon dark>mdi-eye</v-icon> Voir la carte du restaurant
+                </v-btn>
             </v-card-text>
         
             <v-divider class="mx-4"></v-divider>
@@ -87,6 +91,9 @@ export default {
         }
     },
     methods: {
+        see_menus(){
+            window.location = "http://localhost:8081/menu/" + this.current_restaurant._id + "/" + this.current_restaurant.name;
+        },
         restaurant_details(id){
             var xmlhttp = new XMLHttpRequest();
             var self = this;
@@ -183,7 +190,8 @@ export default {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
-    #address{
-        margin-bottom: 5px;
+    .margin_top_bottom{
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 </style>
