@@ -132,12 +132,23 @@ exports.createRestaurant = function(formData, callback) {
 		var db = client.db(dbName);
 
 	    if(!err) {
-	 
+			
+			var convert_to_json = JSON.parse(formData.address);
+			//console.log(convert_to_json.latitude);
+			//console.log(convert_to_json.longitude);
+			
+			
 			let toInsert = {
 				name : formData.nom, 
-				cuisine : formData.cuisine
+				cuisine : formData.cuisine,
+				address : {
+					building: convert_to_json.building,
+					coord: [parseFloat(convert_to_json.longitude), parseFloat(convert_to_json.latitude)],
+					street: convert_to_json.street,
+					zipcode: convert_to_json.zipcode
+				}
 			};
-			console.dir(JSON.stringify(toInsert));
+			console.log(JSON.stringify(toInsert));
 		    db.collection("restaurants")
 		    .insert(toInsert, function(err, insertedId) {
 		    	let reponse;

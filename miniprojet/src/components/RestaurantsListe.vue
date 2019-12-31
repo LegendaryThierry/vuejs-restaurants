@@ -4,7 +4,13 @@
         <v-alert dismissible transition="scale-transition" v-model="deleted_restaurant_error" type="error">La suppression a échoué !</v-alert>
         <v-alert dismissible transition="scale-transition" v-model="edit_restaurant_success" type="success">L'édition du restaurant a été réalisé avec succès !</v-alert>
         <v-alert dismissible transition="scale-transition" v-model="edit_restaurant_error" type="error">L'édition du restaurant a échoué !</v-alert>
-        <v-alert dismissible transition="scale-transition" v-model="add_new_restaurant_success" type="success">Le nouveau restaurant a été ajouté avec succès !</v-alert>
+        <v-alert dismissible transition="scale-transition" v-model="add_new_restaurant_success" type="success">Le nouveau restaurant a été ajouté avec succès ! 
+            <v-btn>
+                <router-link :to="new_restaurant_details_route" tag="span" style="cursor: pointer">
+                    <v-icon left>mdi-face</v-icon>Voir détail
+                </router-link>
+            </v-btn>
+        </v-alert>
         <v-alert dismissible transition="scale-transition" v-model="add_new_restaurant_error" type="error">L'ajout du nouveau restaurant a échoué !</v-alert>
 
         <v-dialog v-model="add_new_restaurant_dialog" persistent>
@@ -15,10 +21,23 @@
                 <v-card-text>
                     <v-container>
                         <v-row>
-                            <v-text-field name="name" v-model="add_new_restaurant_values.name" label="Nom*" required></v-text-field>
+                            <v-col :cols="6">
+                                <v-text-field name="name" v-model="add_new_restaurant_values.name" label="Nom*" required></v-text-field>
+                            </v-col>
+                            <v-col :cols="6">
+                                <v-text-field name="cuisine" v-model="add_new_restaurant_values.cuisine" label="Cuisine*" required></v-text-field>
+                            </v-col>
                         </v-row>
                         <v-row>
-                            <v-text-field name="cuisine" v-model="add_new_restaurant_values.cuisine" label="Cuisine*" required></v-text-field>
+                            <v-col :cols="3">
+                                <v-text-field class="col-sm-3" v-model="add_new_restaurant_values.address.building" name="building" label="Building Number*" required></v-text-field>
+                            </v-col>
+                            <v-col :cols="6">    
+                                <v-text-field class="col-sm-6" v-model="add_new_restaurant_values.address.street" name="street" label="Street*" required></v-text-field>
+                            </v-col>
+                            <v-col :cols="3">     
+                                <v-text-field class="col-sm-3" v-model="add_new_restaurant_values.address.zipcode" name="zipcode" label="Zipcode*" required></v-text-field>
+                            </v-col>
                         </v-row>
                     </v-container>
                     <small>*Champs Obligatoires</small>
@@ -26,7 +45,7 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="add_new_restaurant_dialog = false">Annuler</v-btn>
-                    <v-btn color="blue darken-1" text @click="add_new_restaurant_request">Confirmer</v-btn>
+                    <v-btn color="blue darken-1" text @click="add_new_restaurant_confirmed">Confirmer</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -38,11 +57,13 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <v-row cols="12">
-                            <v-text-field v-model="edited_restaurant.name" name="name" label="Nom*" required></v-text-field>
-                        </v-row>
-                        <v-row cols="12">
-                            <v-text-field v-model="edited_restaurant.cuisine" name="cuisine" label="Cuisine*" required></v-text-field>
+                        <v-row>
+                            <v-col cols="6">
+                                <v-text-field v-model="edited_restaurant.name" name="name" label="Nom*" required></v-text-field>
+                            </v-col>
+                            <v-col cols="6">
+                                <v-text-field v-model="edited_restaurant.cuisine" name="cuisine" label="Cuisine*" required></v-text-field>
+                            </v-col>
                         </v-row>
                     </v-container>
                     <small>*Champs Obligatoires</small>
@@ -104,6 +125,7 @@ export default {
     name: "RestaurantsListe",
     data () {
         return {
+            new_restaurant_details_route : { name: 'details', params: { id: "" }},
             items_per_page: 10,
             search_restaurant_name: "",
             add_new_restaurant_success: false,
@@ -127,7 +149,14 @@ export default {
             restaurants: [],
             add_new_restaurant_values: {
                 name: "",
-                cuisine: ""
+                cuisine: "",
+                address: {
+                    building: "",
+                    street: "",
+                    zipcode: "",
+                    latitude: 0,
+                    longitude: 0
+                }
             },
             edited_restaurant: {
                 name: "",
@@ -185,6 +214,7 @@ export default {
             formData.append('_id', this.edited_restaurant["_id"]);
             formData.append('nom', this.edited_restaurant["name"]);
             formData.append('cuisine', this.edited_restaurant["cuisine"]);
+            formData.append("address", this.edited_restaurant["address"]);
 
             fetch(url, {
                 method: "PUT",
@@ -211,6 +241,33 @@ export default {
         add_new_restaurant(){
             this.add_new_restaurant_dialog = true;
         },
+        add_new_restaurant_confirmed(){
+            this.get_city_info(this.add_new_restaurant_values.address.zipcode);
+        },
+        get_city_info(zipcode){
+            var self = this;
+            fetch("https://community-zippopotamus.p.rapidapi.com/us/" + zipcode, {
+                "method": "GET",
+                "headers": {
+                    "x-rapidapi-host": "community-zippopotamus.p.rapidapi.com",
+                    "x-rapidapi-key": "28b692c4b4msh294bae85fa3c804p172991jsn85f922200e47"
+                }
+            })
+            .then(response => {
+                response.json().then(data => ({
+                        data: data,
+                        status: response.status
+                    })
+                ).then(res => {
+                    self.add_new_restaurant_values.address.longitude = res.data.places[0]["longitude"];
+                    self.add_new_restaurant_values.address.latitude = res.data.places[0]["latitude"];
+                    self.add_new_restaurant_request();
+                });
+            })
+            .catch(err => {
+                console.log(err);
+            });
+        },
         add_new_restaurant_request(){
             var self = this;
             this.add_new_restaurant_dialog = false;
@@ -218,6 +275,7 @@ export default {
             var formData = new FormData();
             formData.append('nom', this.add_new_restaurant_values["name"]);
             formData.append('cuisine', this.add_new_restaurant_values["cuisine"]);
+            formData.append('address', JSON.stringify(this.add_new_restaurant_values["address"]));
 
             fetch(this.url, {
                 method: "POST",
@@ -229,6 +287,7 @@ export default {
                         console.log(res);
                         // Maintenant res est un vrai objet JavaScript
                         if(res["succes"] === true){
+                            self.new_restaurant_details_route.params.id = res.result;
                             self.add_new_restaurant_success = true;
                             self.get_restaurants();
                         }

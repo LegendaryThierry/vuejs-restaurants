@@ -34,38 +34,18 @@
         
                 <h3 class="margin_top_bottom"><v-icon>mdi-map-marker</v-icon>{{ address }}</h3>
                 <RestaurantsMap v-bind:latitude="latitude" v-bind:longitude="longitude" v-bind:name="name" v-bind:address="address"></RestaurantsMap>
-                <v-btn class="col-sm-12 margin_top_bottom" dark color="green" @click="see_menus">
-                    <v-icon dark>mdi-eye</v-icon> Voir la carte du restaurant
-                </v-btn>
             </v-card-text>
-        
+
             <v-divider class="mx-4"></v-divider>
+            <v-btn class="col-sm-12 margin_top_bottom" dark color="green" @click="see_menus">
+                <v-icon dark>mdi-eye</v-icon> Voir la carte du restaurant
+            </v-btn>
+
+            <v-divider class="mx-4"></v-divider>
+            <RestaurantsEvaluation v-bind:evaluations="evaluations"></RestaurantsEvaluation>
         
-            <v-card-title>Tonight's availability</v-card-title>
-        
-            <v-card-text>
-                <v-chip-group
-                active-class="deep-purple accent-4 white--text"
-                column
-                >
-                <v-chip>5:30PM</v-chip>
-        
-                <v-chip>7:30PM</v-chip>
-        
-                <v-chip>8:00PM</v-chip>
-        
-                <v-chip>9:00PM</v-chip>
-                </v-chip-group>
-            </v-card-text>
-        
-            <v-card-actions>
-                <v-btn
-                color="deep-purple accent-4"
-                text
-                >
-                Reserve
-                </v-btn>
-            </v-card-actions>
+            
+    
         </v-card>
     </v-app>
 </template>
@@ -73,14 +53,17 @@
 <script>
 // @ is an alias to /src (in a vue-cli generated project)
 import RestaurantsMap from '@/components/RestaurantsMap'
+import RestaurantsEvaluation from '@/components/RestaurantsEvaluation'
 
 export default {
     components: {
-        RestaurantsMap
+        RestaurantsMap,
+        RestaurantsEvaluation
     },
     name: "RestaurantsListe",
     data () {
         return {
+            evaluations: [],
             loading: false,
             city: "",
             state: "",
@@ -103,7 +86,11 @@ export default {
             xmlhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     var json = JSON.parse(this.responseText);
+                    console.log(json);
                     self.current_restaurant = json["restaurant"];
+                    if(self.current_restaurant.grades != undefined){
+                        self.evaluations = self.current_restaurant.grades;
+                    }
                     self.get_city(self.current_restaurant.address.zipcode);
                     self.compute_grades();
                 }
@@ -113,31 +100,33 @@ export default {
         },
         compute_grades(){
             var grades = this.current_restaurant.grades;
-            var current_grade = "";
-            var sum = 0;
-            for(var i=0; i<grades.length; i++){
-                current_grade = grades[i].grade;
-                if(current_grade === "A"){
-                    sum += 5;
+            if(grades != undefined){
+                var current_grade = "";
+                var sum = 0;
+                for(var i=0; i<grades.length; i++){
+                    current_grade = grades[i].grade;
+                    if(current_grade === "A"){
+                        sum += 5;
+                    }
+                    else if(current_grade === "B"){
+                        sum += 4
+                    }
+                    else if(current_grade === "c"){
+                        sum += 3
+                    }
+                    else if(current_grade === "D"){
+                        sum += 2
+                    }
+                    else if(current_grade === "E"){
+                        sum += 1
+                    }
+                    else if(current_grade === "F"){
+                        sum += 0
+                    }
                 }
-                else if(current_grade === "B"){
-                    sum += 4
-                }
-                else if(current_grade === "c"){
-                    sum += 3
-                }
-                else if(current_grade === "D"){
-                    sum += 2
-                }
-                else if(current_grade === "E"){
-                    sum += 1
-                }
-                else if(current_grade === "F"){
-                    sum += 0
-                }
+                this.nb_comments = grades.length;
+                this.mean = sum/grades.length;
             }
-            this.nb_comments = grades.length;
-            this.mean = sum/grades.length;
         },
         get_city(zipcode){
             var self = this;
@@ -154,8 +143,8 @@ export default {
                         status: response.status
                     })
                 ).then(res => {
-                   self.city = res.data.places[0]["place name"];
-                   self.state = res.data.places[0]["state abbreviation"];
+                    self.city = res.data.places[0]["place name"];
+                    self.state = res.data.places[0]["state abbreviation"];
                 });
             })
             .catch(err => {
