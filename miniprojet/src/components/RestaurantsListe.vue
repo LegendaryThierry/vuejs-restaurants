@@ -36,7 +36,7 @@
                                 <v-text-field class="col-sm-6" v-model="add_new_restaurant_values.address.street" name="street" label="Street*" required></v-text-field>
                             </v-col>
                             <v-col :cols="3">     
-                                <v-text-field class="col-sm-3" v-model="add_new_restaurant_values.address.zipcode" name="zipcode" label="Zipcode*" required></v-text-field>
+                                <v-text-field class="col-sm-3" v-model="add_new_restaurant_values.address.zipcode" name="zipcode" label="US Zipcode*" required></v-text-field>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -284,7 +284,6 @@ export default {
             .then(function(responseJSON) {
                 responseJSON.json()
                     .then(function(res) {
-                        console.log(res);
                         // Maintenant res est un vrai objet JavaScript
                         if(res["succes"] === true){
                             self.new_restaurant_details_route.params.id = res.result;

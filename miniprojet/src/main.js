@@ -5,7 +5,8 @@ import VueRouter from "vue-router";
 import RestaurantsListe from "./components/RestaurantsListe";
 import RestaurantsDetails from "./components/RestaurantsDetails";
 import RestaurantsMenu from "./components/RestaurantsMenu";
-import RestaurantsAdmin from "./components/RestaurantsAdmin";
+import RestaurantsAdminCarte from "./components/RestaurantsAdmin";
+import RestaurantsAdminMenu from "./components/RestaurantsAdminMenu";
 import * as VueGoogleMaps from "vue2-google-maps";
 
 Vue.config.productionTip = false;
@@ -24,7 +25,8 @@ const router = new VueRouter({
     {path: "/", name: 'home', component: RestaurantsListe},
     {path: "/details/:id", name: 'details', component: RestaurantsDetails},
     {path: "/menu/:id/:name", name:"menu", component: RestaurantsMenu},
-    {path: "/admin", name:"admin", component: RestaurantsAdmin}
+    {path: "/admin_carte", name:"admin", component: RestaurantsAdminCarte},
+    {path: "/admin_menu", name:"admin_menu", component: RestaurantsAdminMenu}
   ],
   mode: "history"
 });

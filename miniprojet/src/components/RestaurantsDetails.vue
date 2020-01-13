@@ -1,5 +1,27 @@
 <template>
     <v-app id="inspire">
+        <v-dialog
+            v-model="loader"
+            hide-overlay
+            persistent
+            width="500"
+            lazy          
+            >
+            <v-card
+                color="primary"
+                dark
+            >
+                <v-card-text>
+                Chargement de la page en cours
+                <v-progress-linear
+                    indeterminate
+                    color="white"
+                    class="mb-0"
+                ></v-progress-linear>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
+
         <v-card
         :loading="loading"
         class="mx-auto my-12"
@@ -63,6 +85,7 @@ export default {
     name: "RestaurantsListe",
     data () {
         return {
+            loader: true,
             evaluations: [],
             loading: false,
             city: "",
@@ -145,6 +168,7 @@ export default {
                 ).then(res => {
                     self.city = res.data.places[0]["place name"];
                     self.state = res.data.places[0]["state abbreviation"];
+                    self.loader = false;
                 });
             })
             .catch(err => {
@@ -154,6 +178,8 @@ export default {
     },
     created(){
         this.restaurant_details(this.$route.params.id);
+    },
+    mounted(){
     },
     computed:{
         address: function(){

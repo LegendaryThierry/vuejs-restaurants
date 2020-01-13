@@ -2,7 +2,7 @@
     <v-app style="width:100%;">
         <h1 class="center_header" style="font-size:50px;">{{ restaurant_name }}</h1>
         <v-card class="mx-auto">
-            <div class="col-sm-12" style="min-width:1200px;">
+            <div class="col-sm-12" style="width:100vw;">
                 <v-row>
                     <v-col :cols="3">
                         <v-btn class="col-sm-12 vertical-align:center;" dark color="green" @click="see_menus()">
@@ -14,7 +14,7 @@
                             <v-col :cols="12">
                                 <h3>Vos Menus :</h3>
                                 <ul class="offset-sm-1">
-                                    <li style="font-size:18px;" v-for="menu in command_menu" :key="menu">{{ menu.name }} : {{ menu.price }}€ x{{ menu.nb }}</li>
+                                    <li style="font-size:18px;" v-for="menu in command_menu" :key="menu.name">{{ menu.name }} : {{ menu.price }}€ x{{ menu.nb }}</li>
                                 </ul>
                             </v-col>
                             <v-col :cols="12">
@@ -58,7 +58,7 @@
                                 <h2 class="center_header">Entrées</h2>
                             </v-col>
                             <v-col v-for="starter in item.menu_list.starters" :key="starter.name" :cols="6">
-                                <v-card min-height="300px">
+                                <v-card height="350px">
                                     <v-img
                                         :src="starter.photo"
                                         class="white--text align-end"
@@ -68,22 +68,6 @@
                                         <v-card-title v-text="starter.name"></v-card-title>
                                     </v-img>
                                     <p class="description">{{ starter.description }}</p>
-                        
-                                    <v-card-actions>
-                                        <v-spacer></v-spacer>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-heart</v-icon>
-                                        </v-btn>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-bookmark</v-icon>
-                                        </v-btn>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-share-variant</v-icon>
-                                        </v-btn>
-                                    </v-card-actions>
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -92,7 +76,7 @@
                                 <h2 class="center_header">Plats</h2>
                             </v-col>
                             <v-col v-for="main_course in item.menu_list.main_courses" :key="main_course.name" :cols="6">
-                                <v-card min-height="200px">
+                                <v-card height="350px">
                                     <v-img
                                         :src="main_course.photo"
                                         class="white--text align-end"
@@ -102,21 +86,6 @@
                                         <v-card-title v-text="main_course.name"></v-card-title>
                                     </v-img>
                                     <p class="description">{{ main_course.description }}</p>
-                                    <v-card-actions>
-                                        <v-spacer></v-spacer>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-heart</v-icon>
-                                        </v-btn>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-bookmark</v-icon>
-                                        </v-btn>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-share-variant</v-icon>
-                                        </v-btn>
-                                    </v-card-actions>
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -125,7 +94,7 @@
                                 <h2 class="center_header">Desserts</h2>
                             </v-col>
                             <v-col v-for="dessert in item.menu_list.desserts" :key="dessert.name" :cols="6">
-                                <v-card min-height="200px">
+                                <v-card height="350px">
                                     <v-img
                                         :src="dessert.photo"
                                         class="white--text align-end"
@@ -135,22 +104,6 @@
                                         <v-card-title v-text="dessert.name"></v-card-title>
                                     </v-img>
                                     <p class="description">{{ dessert.description }}</p>
-                        
-                                    <v-card-actions>
-                                        <v-spacer></v-spacer>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-heart</v-icon>
-                                        </v-btn>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-bookmark</v-icon>
-                                        </v-btn>
-                        
-                                        <v-btn icon>
-                                        <v-icon>mdi-share-variant</v-icon>
-                                        </v-btn>
-                                    </v-card-actions>
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -173,7 +126,7 @@
 
                         <v-col
                             v-for="dish in course.list"
-                            :key="dish"
+                            :key="dish.id"
                             :cols="3"
                         >
                             <v-card height="400px">
@@ -183,7 +136,7 @@
                                     gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
                                     height="200px"
                                 >
-                                    <v-card-title v-text="dish.name"></v-card-title>
+                                    <v-card-title>{{ dish.name }} - {{ dish.price }} €</v-card-title>
                                 </v-img>
                                 <p style="height:100px;" class="description">{{ dish.description }}</p>
                     
@@ -288,8 +241,12 @@ export default {
         get_menus(){
             var self = this;
             this.restaurant_name = this.$route.params.name;
-            fetch("http://localhost:3000/get_menus", {
-                "method": "GET"
+            fetch("https://api.jsonbin.io/b/5e15ff5f5df640720831d7eb", {
+                "method": "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    "secret-key" : "$2b$10$/WnZtWOTa2m7MMa3PLAD2.uMxJuoMMxK3cow2eARSSSxsDOzbw4cm"
+                }
             })
             .then(response => {
                 response.json().then(data => ({
@@ -308,8 +265,12 @@ export default {
         get_carte(){
             var self = this;
             this.restaurant_name = this.$route.params.name;
-            fetch("http://localhost:3000/get_cartes", {
-                "method": "GET"
+            fetch("https://api.jsonbin.io/b/5e1601fd8d761771cc8d5577", {
+                "method": "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    "secret-key" : "$2b$10$/WnZtWOTa2m7MMa3PLAD2.uMxJuoMMxK3cow2eARSSSxsDOzbw4cm"
+                }
             })
             .then(response => {
                 response.json().then(data => ({
@@ -348,5 +309,6 @@ export default {
     }
     .description{
         font-size:14px;
+        padding: 10px;
     }
 </style>
