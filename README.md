@@ -14,13 +14,17 @@ Projet réalisé par Thierry TSANG et Alexis VIGHI.
 - Node.js
 
 ## Initialisation de l'application
+Dans le dossier miniprojet :
+```
+npm install
+```
 Dans le dossier miniprojet/serveur :
 ```
-	node serverCrudWithMongo.js
+node serverCrudWithMongo.js
 ```
 Dans le dossier miniprojet :
 ```
-	npm run serve -- --port 8081
+npm run serve -- --port 8081
 ```
 Utilisez votre navigateur internet préféré et accédez à l'URL ci-dessous :
 
